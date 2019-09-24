@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+const commander = require('commander')
+const path = require('path')
+
+// 定义当前的版本 定义使用的方法 定义四个指令
+commander
+  .version(require(path.resolve(__dirname,'../package.json')).version)
+  .usage('<command> [options]')
+  .command('add','add a new template')
+  .command('delete','delete a new template')
+  .command('list','list all templates')
+  .command('init','add a new template')
+
+// 解析命令行的参数
+commander.parse(process.argv)

@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const chalk = require('chalk');
+const tpl = require(path.resolve(__dirname, '../template.json'));
+
+console.log(chalk.grey('当前的模板列表如下: \n'))
+console.log(tpl)

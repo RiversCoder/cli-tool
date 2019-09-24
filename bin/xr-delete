@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+
+const path = require('path');
+// 命令行问答交互
+const inquirer = require('inquirer');
+// 修改控制台字符串的样式
+const chalk = require('chalk');
+// node 内置文件模块
+const fs = require('fs');
+// 读取根目录下面的 template.json 模板配置文件
+const tpl = require(path.resolve(__dirname,'../template.json'))
+
+
+// 自定义命令行交互式问题
+let questions = [{
+  name: 'name', type: 'input', message: '请输入要删除的模板名称',
+  validate(val){
+    if(val == ''){
+      return 'Name is required'
+    }else if(!tpl[val]){
+      return 'Template does not exist.'
+    }else{
+      return true
+    }
+  }
+}];
+
+// 接收问题的答案
+inquirer.prompt(questions).then(answers => {
+  // 获取传递过来的参数 删除对应属性
+  const { name } = answers;
+  delete tpl[name];
+
+  // 把信息写入 template.json 文件中
+  fs.writeFile(path.resolve(__dirname,'../template.json'),JSON.stringify(tpl), 'utf-8', err => {
+    if(err) console.log(err)
+    console.log('\n')
+    console.log(chalk.green('删除成功 success!\n'))
+    console.log(chalk.grey('最新的模板列表如下: \n'))
+    console.log(tpl)
+    console.log('\n')
+  });
+
+})

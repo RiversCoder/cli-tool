@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const commander = require('commander');
+// 引入加载动画效果
+const ora = require('ora');
+// 引入远程仓库下载器
+const download = require('download-git-repo');
+// 修改控制台字符串的样式
+const chalk = require('chalk');
+// 读取根目录下面的 template.json 模板配置文件
+const tpl = require(path.resolve(__dirname,'../template.json'));
+
+
+// 使用手册信息
+commander.usage('<template-name>[project-name]')
+// 解析命令行传递的参数
+commander.parse(process.argv)
+// 当没有输入内容的时候 提示如下
+if (commander.args.length < 1) return commander.help()
+
+// 类似于 vue int webpack project-name
+let templateName = commander.args[0];
+let projectName = commander.args[1];
+
+// 检测参数 如果模板名称不存在 打印报错信息 停止执行
+if(!tpl[templateName]){
+  console.log(chalk.red('\n 模板中不存在该字段. \n'))
+  return
+}
+// 检测参数 如果项目名称不存在 打印报错信息 停止执行
+if(!projectName){
+  console.log(chalk.red('\n 项目名称不应该为空. \n'))
+  return
+}
+
+// 获取对应模板名称对应的 url
+let url = tpl[templateName];
+console.log(chalk.white('\n 开始生成项目…… \n'));
+//出现加载图标
+const spinner = ora('下载中……');
+spinner.start();
+
+// 开始下载拉取仓库资源
+download(url,projectName,err => {
+  if(err){
+    spinner.fail();
+    console.log(chalk.red(`\n构建失败.`))
+    return
+  }
+  // 结束加载
+  spinner.succeed();
+  console.log(chalk.green('\n 构建完成.'))
+  console.log('\n To get started')
+  console.log(`\n  cd ${projectName} \n`);
+  return true;
+});
